@@ -27,6 +27,13 @@ SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 int folder;
 int song;
+int counter = 0;
+String power_ = "off";
+unsigned long interval_one = 5000;     // the time we need to wait
+unsigned long interval_two = 333;     // the time we need to wait
+unsigned long previousMillis_one = 0;  // millis() returns an unsigned long.
+unsigned long previousMillis_two = 0;  // millis() returns an unsigned long.
+unsigned long buttonTime = 0;  
 void printDetail(uint8_t type, int value);
 
 enum States {
@@ -56,10 +63,10 @@ void setup()
         }
         Serial.println(F("DFPlayer Mini online."));
         
-        myDFPlayer.volume(30);  //Set volume value. From 0 to 30
-        Serial.println(F("Playing song 1"));
-        myDFPlayer.playFolder(1, 1);
-        Serial.println(F("Song 1 played"));
+        myDFPlayer.volume(25);  //Set volume value. From 0 to 30
+        // Serial.println(F("Playing song 1"));
+        // myDFPlayer.playFolder(1, 1);
+        // Serial.println(F("Song 1 played"));
 
         // myDFPlayer.play(1);  //Play the first mp3
     }
@@ -68,18 +75,49 @@ void loop()
     {
         // Checking if the button is pressed
         boolean btnPressed = !digitalRead(3);
-        static unsigned long timer = millis();
-        // static unsigned long timer_two = millis();
+        static unsigned long timer = millis();        
 
         if(btnPressed == true)
         {   
             // What happens when the button is pressed:
+            // if (buttonTime == 0) {
+            //   buttonTime = millis();
+            // } else if (buttonTime - previousMillis_two <= interval_two)
+            // {
+            //   counter += 1;
+            // } else
+            // {
+            //   counter = 0;
+            // }
+            
+            
+            
+            // static unsigned long timer_two = millis();
+
             status = GREETINGS;
         }         
-
+        // if (millis() - timer < 1000) {
+        //   if (btnPressed == true) {
+        //     counter += 1;
+        //     Serial.println(counter);
+        //   }          
+        //   if (counter > 2) {
+        //     if (power_ == "on") {
+        //       power_ = "off";
+        //     } else if (power_ == "off")
+        //     {
+        //       power_ = "on";
+        //     }                        
+        //   }
+          
+        // } else
+        // {
+        //   counter = 0;
+        // }
         
-        if (millis() - timer > 5000) {
-            timer = millis();
+        // if (power_ == "on") {
+          if (timer - previousMillis_one >= interval_one) {
+            
                 if (status == GOODBYE) {
                     if (locked < 3) {
                         locked += 1;
@@ -93,7 +131,11 @@ void loop()
                 status = GOODBYE;
             }                
             chooseFile(status);  //Play next mp3 every 5 second.
-        }            
+            previousMillis_one = millis();
+          }     
+        // }
+        
+               
             
             
         
