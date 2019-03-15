@@ -116,8 +116,9 @@ void loop()
         // }
         
         // if (power_ == "on") {
-          if (timer - previousMillis_one >= interval_one) {
-            
+          // Serial.println(timer - previousMillis_one);
+        if (millis() - timer > 5000) {
+            timer = millis();
                 if (status == GOODBYE) {
                     if (locked < 3) {
                         locked += 1;
@@ -131,8 +132,7 @@ void loop()
                 status = GOODBYE;
             }                
             chooseFile(status);  //Play next mp3 every 5 second.
-            previousMillis_one = millis();
-          }     
+        }      
         // }
         
                
