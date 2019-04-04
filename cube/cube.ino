@@ -27,14 +27,8 @@ SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 int folder;
 int song;
-int available_ = 0;
 int locked = 0;
 int pressed = 0;
-int played = 0;
-int hjaelp_mig = 13000;
-int navle_kloer = 3500;
-String power_ = "off";
-unsigned long buttonTime = 0;  
 void printDetail(uint8_t type, int value);
 
 enum States {
@@ -65,11 +59,6 @@ void setup()
         Serial.println(F("DFPlayer Mini online."));
         
         myDFPlayer.volume(15);  //Set volume value. From 0 to 30
-        // Serial.println(F("Playing song 1"));
-        // myDFPlayer.playFolder(1, 1);
-        // Serial.println(F("Song 1 played"));
-
-        // myDFPlayer.play(1);  //Play the first mp3
         chooseFile(HELLO);
         randomSeed(analogRead(0));
     }
