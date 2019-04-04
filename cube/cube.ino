@@ -27,12 +27,13 @@ SoftwareSerial mySoftwareSerial(10, 11); // RX, TX
 DFRobotDFPlayerMini myDFPlayer;
 int folder;
 int song;
-int counter = 0;
+int available_ = 0;
+int locked = 0;
+int pressed = 0;
+int played = 0;
+int hjaelp_mig = 13000;
+int navle_kloer = 3500;
 String power_ = "off";
-unsigned long interval_one = 5000;     // the time we need to wait
-unsigned long interval_two = 333;     // the time we need to wait
-unsigned long previousMillis_one = 0;  // millis() returns an unsigned long.
-unsigned long previousMillis_two = 0;  // millis() returns an unsigned long.
 unsigned long buttonTime = 0;  
 void printDetail(uint8_t type, int value);
 
@@ -43,7 +44,7 @@ enum States {
 };
 
 States status = HELLO;
-int locked = 0;
+
 void setup()
     {
         // Setup so the button can be detected
@@ -63,85 +64,60 @@ void setup()
         }
         Serial.println(F("DFPlayer Mini online."));
         
-        myDFPlayer.volume(25);  //Set volume value. From 0 to 30
+        myDFPlayer.volume(15);  //Set volume value. From 0 to 30
         // Serial.println(F("Playing song 1"));
         // myDFPlayer.playFolder(1, 1);
         // Serial.println(F("Song 1 played"));
 
         // myDFPlayer.play(1);  //Play the first mp3
+        chooseFile(HELLO);
+        randomSeed(analogRead(0));
     }
 
 void loop()
     {
         // Checking if the button is pressed
         boolean btnPressed = !digitalRead(3);
-        static unsigned long timer = millis();        
+        // static unsigned long timer = millis();        
 
         if(btnPressed == true)
-        {   
-            // What happens when the button is pressed:
-            // if (buttonTime == 0) {
-            //   buttonTime = millis();
-            // } else if (buttonTime - previousMillis_two <= interval_two)
-            // {
-            //   counter += 1;
-            // } else
-            // {
-            //   counter = 0;
-            // }
-            
-            
-            
-            // static unsigned long timer_two = millis();
-
+        {
             status = GREETINGS;
-        }         
-        // if (millis() - timer < 1000) {
-        //   if (btnPressed == true) {
-        //     counter += 1;
-        //     Serial.println(counter);
-        //   }          
-        //   if (counter > 2) {
-        //     if (power_ == "on") {
-        //       power_ = "off";
-        //     } else if (power_ == "off")
-        //     {
-        //       power_ = "on";
-        //     }                        
-        //   }
-          
-        // } else
-        // {
-        //   counter = 0;
-        // }
-        
-        // if (power_ == "on") {
-          // Serial.println(timer - previousMillis_one);
-        if (millis() - timer > 5000) {
-            timer = millis();
-                if (status == GOODBYE) {
-                    if (locked < 3) {
-                        locked += 1;
-                    } else
-                    {
-                        locked = 0;
-                        status = HELLO;
-                }                
-            }
-            if (status == GREETINGS && btnPressed == false) {
-                status = GOODBYE;
-            }                
-            chooseFile(status);  //Play next mp3 every 5 second.
-        }      
-        // }
-        
-               
-            
-            
-        
-        if (myDFPlayer.available()) {
-            printDetail(myDFPlayer.readType(), myDFPlayer.read()); //Print the detail message from DFPlayer to handle different errors and states.
+            if (locked == 0) {
+              chooseFile(status);
+            }    
+            locked = 1;
+        } else if (status == GREETINGS && btnPressed == false)
+        {
+          status = GOODBYE;
         }
+        
+
+        if (myDFPlayer.available()) {
+          printDetail(myDFPlayer.readType(), myDFPlayer.read());
+        }
+        if (myDFPlayer.readType() == 5) {
+          
+          // delay(300);
+          // if (played == 2) {
+          //   status = HELLO;
+          //   played = 0;
+          // } else
+          // {
+          //   played++;
+          // }
+          
+          
+          if (status == HELLO) {
+            chooseFile(status);
+          }          
+          if (status == GOODBYE) {
+            chooseFile(status);
+            status = HELLO;
+            // played = 1;
+          }           
+          locked = 0;
+        }     
     }
     
 
@@ -150,19 +126,27 @@ void chooseFile(States state){
     {
         case HELLO:
             folder = 1;
-            song = int(random(1, 7));
+            // song = 1;
+            // Serial.println("HELLO");
+            song = random(1, 4);
             break;
         case GREETINGS:
             folder = 2;
-            song = int(random(1, 4));        
+            // song = 1;
+            // Serial.println("GREETINGS");
+            song = random(1, 3);        
             break;
         case GOODBYE:
             folder = 3;
-            song = int(random(1, 4));        
+            // song = 1;
+            // Serial.println("GOODBYE");
+            song = random(1, 5);        
             break;    
         default:
             folder = 1;
-            song = int(random(1, 7));
+            song = 1;
+            // Serial.println("DEFAULT");
+            // song = int(random(1, 7));
             break;
     }
     myDFPlayer.playFolder(folder, song);
@@ -186,6 +170,7 @@ void printDetail(uint8_t type, int value){
       Serial.println(F("Card Online!"));
       break;
     case DFPlayerPlayFinished:
+      // Serial.println(myDFPlayer.readType());
       Serial.print(F("Number:"));
       Serial.print(value);
       Serial.println(F(" Play Finished!"));
