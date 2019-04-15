@@ -58,7 +58,7 @@ void setup()
         }
         Serial.println(F("DFPlayer Mini online."));
         
-        myDFPlayer.volume(15);  //Set volume value. From 0 to 30
+        myDFPlayer.volume(30);  //Set volume value. From 0 to 30
         chooseFile(HELLO);
         randomSeed(analogRead(0));
     }
